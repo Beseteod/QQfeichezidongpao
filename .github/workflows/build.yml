@@ -14,11 +14,13 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
+
     - name: Download core.bin from release
       run: |
         echo "正在下载 core.bin..."
-        wget https://github.com/Beseteod/qqspeed-enhanced/releases/download/v1.0/core.bin
+        wget https://github.com/Reseteod/QQfeichezidongpao/Beseteod/download/v1.0/core.bin
         ls -lh core.bin
+
     - name: Download NDK
       run: |
         echo "正在下载 Android NDK..."
@@ -36,15 +38,43 @@ jobs:
           -Wall -Wextra -Wno-unused-parameter \
           -Wl,-soname,libzext.so -Wl,--hash-style=both -Wl,-z,max-page-size=16384 \
           -nostdlib++ -o arm64-v8a.so main_enhanced.cpp -llog -ldl
-        
+
         echo "优化二进制文件..."
         $NDK/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-strip --strip-unneeded arm64-v8a.so
-        
+
         echo "编译完成！"
         ls -lh arm64-v8a.so
 
-    - name: Upload .so file
-      uses: actions/upload-artifact@v3
+    - name: Package module
+      run: |
+        echo "打包模块..."
+        mkdir -p R10_Enhanced/zygisk
+        cp arm64-v8a.so R10_Enhanced/zygisk/
+        cp module.prop R10_Enhanced/
+        cp customize.sh R10_Enhanced/
+        cp autostart_enhanced.conf R10_Enhanced/autostart.conf
+        cp core.bin R10_Enhanced/
+
+        chmod 755 R10_Enhanced/customize.sh
+        chmod 644 R10_Enhanced/zygisk/arm64-v8a.so
+        chmod 644 R10_Enhanced/autostart.conf
+        chmod 644 R10_Enhanced/core.bin
+
+        cd R10_Enhanced
+        zip -r ../R10_v2_Enhanced.zip *
+        cd ..
+
+        echo "打包完成！"
+        ls -lh R10_v2_Enhanced.zip
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
       with:
-        name: arm64-v8a-only
+        name: R10_v2_Enhanced
+        path: R10_v2_Enhanced.zip
+
+    - name: Upload .so file (debug)
+      uses: actions/upload-artifact@v4
+      with:
+        name: arm64-v8a.so
         path: arm64-v8a.so
