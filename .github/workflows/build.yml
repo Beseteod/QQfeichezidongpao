@@ -18,8 +18,7 @@ jobs:
     - name: Download core.bin from release
       run: |
         echo "正在下载 core.bin..."
-        wget https://github.com/Reseteod/QQfeichezidongpao/Beseteod/download/v1.0/core.bin
-        ls -lh core.bin
+        wget https://github.com/Beseteod/QQfeichezidongpao/releases/download/v1.0/core.bin
 
     - name: Download NDK
       run: |
