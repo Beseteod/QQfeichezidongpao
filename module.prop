@@ -1,0 +1,6 @@
+id=qqsr20
+name=Q20 Runtime
+version=2.0
+versionCode=20
+author=zaka
+description=Runtime loader. Reads its image at zygote stage, maps it from an anonymous jit-cache area, no helper process, no file under /data.
