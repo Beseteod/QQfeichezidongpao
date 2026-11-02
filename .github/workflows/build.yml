@@ -14,7 +14,11 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
-
+    - name: Download core.bin from release
+      run: |
+        echo "正在下载 core.bin..."
+        wget https://github.com/Beseteod/qqspeed-enhanced/releases/download/v1.0/core.bin
+        ls -lh core.bin
     - name: Download NDK
       run: |
         echo "正在下载 Android NDK..."
