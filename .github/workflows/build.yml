@@ -1,0 +1,46 @@
+name: Build R10 Enhanced
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Download NDK
+      run: |
+        echo "正在下载 Android NDK..."
+        wget -q https://dl.google.com/android/repository/android-ndk-r26d-linux.zip
+        echo "正在解压 NDK..."
+        unzip -q android-ndk-r26d-linux.zip
+        echo "NDK 准备完成"
+        echo "NDK=$PWD/android-ndk-r26d" >> $GITHUB_ENV
+
+    - name: Build module
+      run: |
+        echo "开始编译..."
+        $NDK/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang++ \
+          -shared -fPIC -O2 -fvisibility=hidden -fno-exceptions -fno-rtti \
+          -Wall -Wextra -Wno-unused-parameter \
+          -Wl,-soname,libzext.so -Wl,--hash-style=both -Wl,-z,max-page-size=16384 \
+          -nostdlib++ -o arm64-v8a.so main_enhanced.cpp -llog -ldl
+        
+        echo "优化二进制文件..."
+        $NDK/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-strip --strip-unneeded arm64-v8a.so
+        
+        echo "编译完成！"
+        ls -lh arm64-v8a.so
+
+    - name: Upload .so file
+      uses: actions/upload-artifact@v3
+      with:
+        name: arm64-v8a-only
+        path: arm64-v8a.so
