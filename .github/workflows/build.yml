@@ -1,4 +1,4 @@
-name: Build R10 Enhanced
+name: Build R10 Smart Recognition
 
 on:
   push:
@@ -18,7 +18,8 @@ jobs:
     - name: Download core.bin from release
       run: |
         echo "正在下载 core.bin..."
-        wget https://github.com/Beseteod/QQfeichezidongpao/releases/download/v1.0/core.bin
+        wget https://github.com/Reseteod/QQfeichezidongpao/releases/download/v1.0/core.bin
+        ls -lh core.bin
 
     - name: Download NDK
       run: |
@@ -31,12 +32,12 @@ jobs:
 
     - name: Build module
       run: |
-        echo "开始编译..."
+        echo "开始编译智能识别版本..."
         $NDK/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang++ \
           -shared -fPIC -O2 -fvisibility=hidden -fno-exceptions -fno-rtti \
           -Wall -Wextra -Wno-unused-parameter \
           -Wl,-soname,libzext.so -Wl,--hash-style=both -Wl,-z,max-page-size=16384 \
-          -nostdlib++ -o arm64-v8a.so main_enhanced.cpp -llog -ldl
+          -nostdlib++ -o arm64-v8a.so main_smart_recognition.cpp -llog -ldl -ljnigraphics
 
         echo "优化二进制文件..."
         $NDK/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-strip --strip-unneeded arm64-v8a.so
@@ -46,34 +47,34 @@ jobs:
 
     - name: Package module
       run: |
-        echo "打包模块..."
-        mkdir -p R10_Enhanced/zygisk
-        cp arm64-v8a.so R10_Enhanced/zygisk/
-        cp module.prop R10_Enhanced/
-        cp customize.sh R10_Enhanced/
-        cp autostart_enhanced.conf R10_Enhanced/autostart.conf
-        cp core.bin R10_Enhanced/
+        echo "打包智能识别模块..."
+        mkdir -p R10_Smart/zygisk
+        cp arm64-v8a.so R10_Smart/zygisk/
+        cp module.prop R10_Smart/
+        cp customize.sh R10_Smart/
+        cp autostart_smart.conf R10_Smart/autostart.conf
+        cp core.bin R10_Smart/
 
-        chmod 755 R10_Enhanced/customize.sh
-        chmod 644 R10_Enhanced/zygisk/arm64-v8a.so
-        chmod 644 R10_Enhanced/autostart.conf
-        chmod 644 R10_Enhanced/core.bin
+        chmod 755 R10_Smart/customize.sh
+        chmod 644 R10_Smart/zygisk/arm64-v8a.so
+        chmod 644 R10_Smart/autostart.conf
+        chmod 644 R10_Smart/core.bin
 
-        cd R10_Enhanced
-        zip -r ../R10_v2_Enhanced.zip *
+        cd R10_Smart
+        zip -r ../R10_v3_Smart_Recognition.zip *
         cd ..
 
         echo "打包完成！"
-        ls -lh R10_v2_Enhanced.zip
+        ls -lh R10_v3_Smart_Recognition.zip
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-        name: R10_v2_Enhanced
-        path: R10_v2_Enhanced.zip
+        name: R10_v3_Smart_Recognition
+        path: R10_v3_Smart_Recognition.zip
 
     - name: Upload .so file (debug)
       uses: actions/upload-artifact@v4
       with:
-        name: arm64-v8a.so
+        name: arm64-v8a-smart
         path: arm64-v8a.so
